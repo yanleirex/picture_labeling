@@ -58,21 +58,24 @@ class FlowerClassifier(QThread):
     def classify(self, image_path):
         self.image_path_signal.emit(image_path)
         # logging.info("classify image")
-        start = time.time()
-        image = caffe.io.load_image(image_path)
-        self.net.blobs['data'].data[...] = self.transformer.preprocess('data', image)
-        self.net.forward()
-        prob = self.net.blobs['prob'].data[0]
-        top_k = self.net.blobs['prob'].data[0].flatten().argsort()[-1:-6:-1]
-        end = time.time()
-        top_prob = [prob[index] for index in top_k]
-        # logging.info("Time cost: {0}".format(end - start))
-        result = list()
-        for i in range(len(top_k)):
-            item = {"label": labels[top_k[i]], "prob": top_prob[i]}
-            result.append(item)
-        results = {"result": result, "time": end-start}
-        self.result_signal.emit(results)
+        try:
+            start = time.time()
+            image = caffe.io.load_image(image_path)
+            self.net.blobs['data'].data[...] = self.transformer.preprocess('data', image)
+            self.net.forward()
+            prob = self.net.blobs['prob'].data[0]
+            top_k = self.net.blobs['prob'].data[0].flatten().argsort()[-1:-6:-1]
+            end = time.time()
+            top_prob = [prob[index] for index in top_k]
+            # logging.info("Time cost: {0}".format(end - start))
+            result = list()
+            for i in range(len(top_k)):
+                item = {"label": labels[top_k[i]], "prob": top_prob[i]}
+                result.append(item)
+            results = {"result": result, "time": end-start}
+            self.result_signal.emit(results)
+        except IOError as e:
+            print e
 
     def run(self):
         if self.image_to_recognition:

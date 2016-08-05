@@ -31,18 +31,12 @@ class MainDialog(QDialog):
         self.reference_image = QLabel()
         self.non_label_image = QLabel()
 
-        # open_image_button = QPushButton(self.tr("打开图像"))
         radio_button_manual = QRadioButton(self.tr("手动"))
         radio_button_auto = QRadioButton(self.tr("自动"))
         radio_button_manual.setChecked(True)
 
         self.imageLabelQLabel = QLineEdit()
         self.current_path = QLabel()
-        # self.current_path_ = QLabel(self.tr("当前图片："))
-        # self.current_path_.setAlignment(Qt.AlignRight)
-        # current_path_layout = QHBoxLayout()
-        # current_path_layout.addWidget(self.current_path_)
-        # current_path_layout.addWidget(self.current_path)
         self.info_text = QTextEdit()
 
         # manual layout
@@ -112,11 +106,11 @@ class MainDialog(QDialog):
 
     def set_init_image(self, reference_image_path=None, image_path=None):
         if reference_image_path is None:
-            reference_image_path = "/home/yanlei/Pictures/yellow-iris-by-wiki-commons.jpg"
+            reference_image_path = "/home/yanlei/Pictures/1a_Anthurium-hookeri.jpg"
         else:
             reference_image_path = reference_image_path
         if image_path is None:
-            image_path = "/home/yanlei/Pictures/3813191262_ecfcdfab8f_b.jpg"
+            image_path = "/home/yanlei/Pictures/2_02e8a61987e89aac8f69fc000a0de7c1.png"
         else:
             image_path = image_path
         self.show_reference_image(reference_image_path)
@@ -187,7 +181,10 @@ class MainDialog(QDialog):
     def set_auto_path(self):
         s = QFileDialog.getExistingDirectory(self, self.tr("选择图像文件夹"), "/home")
         self.auto_image_path = str(s)
-        self.auto_images = glob.glob(self.auto_image_path + '/*.*')
+        self.auto_images = glob.glob(self.auto_image_path + '/*.jpg')
+        self.auto_images.extend(glob.glob(self.auto_image_path + '/*.JPG'))
+        self.auto_images.extend(glob.glob(self.auto_image_path + '/*.png'))
+        self.auto_images.extend(glob.glob(self.auto_image_path + '/*.PNG'))
 
     def set_info(self, info):
         self.info_text.append(info)
