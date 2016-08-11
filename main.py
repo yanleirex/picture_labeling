@@ -15,6 +15,9 @@ class MainDialog(QDialog):
     def __init__(self, parent=None):
         super(MainDialog, self).__init__(parent)
         self.classifier = FlowerClassifier()
+        self.file_good = open('good_image.txt', 'a')
+        self.file_bad = open('bad_image.txt', 'a')
+        self.file_unknown = open('unknown_image.txt', 'a')
 
         self.setWindowTitle(self.tr("图像打标工具"))
         self.setFixedSize(QSize(650, 450))
@@ -181,10 +184,10 @@ class MainDialog(QDialog):
     def set_auto_path(self):
         s = QFileDialog.getExistingDirectory(self, self.tr("选择图像文件夹"), "/home")
         self.auto_image_path = str(s)
-        self.auto_images = glob.glob(self.auto_image_path + '/*.jpg')
-        self.auto_images.extend(glob.glob(self.auto_image_path + '/*.JPG'))
-        self.auto_images.extend(glob.glob(self.auto_image_path + '/*.png'))
-        self.auto_images.extend(glob.glob(self.auto_image_path + '/*.PNG'))
+        self.auto_images = glob.glob(self.auto_image_path + '/*/*.jpg')
+        self.auto_images.extend(glob.glob(self.auto_image_path + '/*/*.JPG'))
+        self.auto_images.extend(glob.glob(self.auto_image_path + '/*/*.png'))
+        self.auto_images.extend(glob.glob(self.auto_image_path + '/*/*.PNG'))
 
     def set_info(self, info):
         self.info_text.append(info)
@@ -197,8 +200,19 @@ class MainDialog(QDialog):
         self.current_path.setText(self.tr("当前图片：") + text)
 
     def show_result(self, results):
+        image_path = results['image_path']
         result = results['result']
         time = results['time']
+        prob = result[0]['prob']
+        label = result[0]['label']
+        line = image_path + ' ' + label + '\n'
+        if prob > 0.9:
+            self.file_good.write(line)
+        elif prob < 0.6:
+            self.file_bad.write(line)
+        else:
+            self.file_unknown.write(line)
+
         result_str = "Label:{0}\nProb:{1}\nTime:{2} ms".format(result[0]['label'], result[0]['prob'], str(time))
         self.set_auto_info(result_str)
         self.set_info(result_str)

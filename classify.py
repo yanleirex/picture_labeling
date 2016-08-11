@@ -72,7 +72,7 @@ class FlowerClassifier(QThread):
             for i in range(len(top_k)):
                 item = {"label": labels[top_k[i]], "prob": top_prob[i]}
                 result.append(item)
-            results = {"result": result, "time": end-start}
+            results = {"image_path": image_path, "result": result, "time": end-start}
             self.result_signal.emit(results)
         except IOError as e:
             print e
